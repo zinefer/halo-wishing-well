@@ -1,25 +1,36 @@
-import logo from './logo.svg';
+import React from "react";
+import { AuthenticatedTemplate, UnauthenticatedTemplate } from "@azure/msal-react";
+
 import './App.css';
 
+import { SignInButton } from "./components/SignInButton";
+import { CoinCounter } from "./components/CoinCounter";
+import { Coin } from './components/Coin'
+import { authConfig } from "./Config";
+
+const AppWrapper = () =>
+  <div className="App">
+    <Coin />
+    <CoinCounter />
+  </div>
+
 function App() {
-  return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
-  );
+  if (authConfig.disable) {
+    return <AppWrapper />
+  } else {
+    return (
+      <>
+        <AuthenticatedTemplate>
+          <AppWrapper />
+        </AuthenticatedTemplate>
+        <UnauthenticatedTemplate>
+          <p>You are not signed in! Please sign in.</p>
+          <br />
+          <SignInButton />
+        </UnauthenticatedTemplate>
+      </>
+    )
+  }
 }
 
 export default App;
