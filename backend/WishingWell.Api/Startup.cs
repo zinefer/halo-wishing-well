@@ -45,6 +45,38 @@ namespace WishingWell.Api
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            // This swaps authentication from identity server to use unvalidated JWTs (and anonymous if we don't pass a JWT.)
+            // This should be used for integration tests, and local testing, but not in production EVER.
+            if (this.applicationSettings.DONOTUSE_ONLY_FOR_CI_DISABLE_AUTHENTICATION)
+            {
+                services.AddSingleton<IAuthorizationHandler, AllowAnonymous>();
+
+                services.AddAuthentication(o =>
+                {
+                    o.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+                    o.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+                })
+                .AddJwtBearer(o =>
+                {
+                    o.RequireHttpsMetadata = false;
+                    o.SaveToken = true;
+                    o.TokenValidationParameters = new TokenValidationParameters
+                    {
+                        ValidateIssuer = false,
+                        ValidateAudience = false,
+                        ValidateIssuerSigningKey = false,
+                        ValidateLifetime = false,
+                        RequireExpirationTime = false,
+                        RequireSignedTokens = false,
+                    };
+                });
+            }
+            else
+            {
+                services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+                        .AddMicrosoftIdentityWebApi(this.Configuration);
+            }
+
             services.AddOptions();
             services
                 .AddOptions<StorageOptions>()
@@ -81,6 +113,21 @@ namespace WishingWell.Api
             {
                 services.AddApplicationInsightsTelemetry(appInsightsKey);
             }
+        }
+
+        // This method gets called by the runtime when ASPNETCORE_ENVIRONMENT is set to Development
+        // However, this convention will not call ConfigureServices(...) so we manually invoke it here, assuming it is our base configuration
+        public void ConfigureDevelopmentServices(IServiceCollection services)
+        {
+            this.ConfigureServices(services);
+            services.AddScoped<TokenCredential>(sp => new DefaultAzureCredential());
+        }
+
+        // This method gets called by the runtime when ASPNETCORE_ENVIRONMENT is set to Production
+        public void ConfigureProductionServices(IServiceCollection services)
+        {
+            this.ConfigureServices(services);
+            services.AddScoped<TokenCredential>(sp => new ManagedIdentityCredential());
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
