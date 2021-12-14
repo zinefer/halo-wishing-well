@@ -12,7 +12,7 @@ RUN dotnet test "WishingWell.UnitTests/WishingWell.UnitTests.csproj"
 # Build Project
 RUN dotnet publish "WishingWell.Api/WishingWell.Api.csproj" -c Release -o /app/publish
 
-# FINAL image
+# FINAL image to minimize image size
 FROM mcr.microsoft.com/dotnet/aspnet:5.0-focal
 WORKDIR /app
 COPY --from=build /app/publish .
