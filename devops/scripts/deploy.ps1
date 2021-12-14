@@ -3,4 +3,5 @@
 # Include common utils
 . ("$PSScriptRoot\common.ps1")
 
-Invoke-Directory-Parallel "devops/scripts/build" "Building"
+& ("$PSScriptRoot\load-docker.ps1")
+& ("$PSScriptRoot\push-docker.ps1")
