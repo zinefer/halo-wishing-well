@@ -1,0 +1,9 @@
+dependencies:
+- name: aad-pod-identity
+  repository: https://raw.githubusercontent.com/Azure/aad-pod-identity/master/charts
+  version: 4.1.6
+- name: keda
+  repository: https://kedacore.github.io/charts
+  version: 2.5.0
+digest: sha256:96b814620d747b27167ae225f9bdeb0afa6b1282393634fc818188904bc05a37
+generated: "2021-12-13T17:33:30.979891559-07:00"
