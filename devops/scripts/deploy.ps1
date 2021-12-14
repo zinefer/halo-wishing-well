@@ -18,3 +18,17 @@ Invoke-Command-Stop {
 }
 Pop-Location
 
+# * Kubernetes 
+az aks get-credentials --name $Env:AKS_NAME --resource-group $Env:RESOURCE_GROUP
+
+helm repo add aad-pod-identity https://raw.githubusercontent.com/Azure/aad-pod-identity/master/charts
+helm repo add kedacore https://kedacore.github.io/charts
+helm dependency build ./devops/helm/wishing-well
+helm upgrade --install "wishingwell-dev" ./devops/helm/wishing-well
+
+sleep 30s
+
+kubectl get crds
+kubectl get all
+kubectl get all -n keda
+kubectl get pods --all-namespaces -o jsonpath="{.items[*].spec.containers[*].image}" | tr -s '[[:space:]]' '\n' | sort | uniq -c
