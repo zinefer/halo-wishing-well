@@ -10,6 +10,10 @@ output "acr_name" {
   value = azurerm_container_registry.main.name
 }
 
+output "frontend_storage_account" {
+  value = azurerm_storage_account.frontend.name
+}
+
 output "queue_storage_account" {
   value = azurerm_storage_account.queue.name
 }

@@ -52,6 +52,13 @@ Things I would improve if this were a real project.
 - Better dependency documentation
 - Better aggregate the number of coins (or queue messages processed)
 - Integrate ;)
+
+### Devops
+
+- Better expose and document deploy scripts
+- End to End test
+- Create github-actions to leverege the release-pipeline and stand up an instance per PR for ease of review
+
 ### Backend
 
 - More Error handling :(
