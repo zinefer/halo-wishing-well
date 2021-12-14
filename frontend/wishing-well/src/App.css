@@ -1,0 +1,17 @@
+body {
+  background-color: #282c34;
+  overflow: hidden;
+}
+
+.App {
+  text-align: center;
+  background-image: url('img/bkg.jpg');
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: center;
+  height: 100vh;
+  width: 100vw;
+  max-width: calc(1.5009380863 * 100vh);
+  max-height: calc(0.66625 * 100vw);
+  margin: auto auto;
+}

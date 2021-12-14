@@ -19,6 +19,10 @@ This is an (incomplete) sample project for 343 industries.
     - DI for testability
     - Swagger for machine-readability (although this seems to be the default in asp.net now)
     - Deployed to App Service with [Docker](devops/docker/WishingWell.Api.Dockerfile)
+- [ReactJS Frontend](frontend/wishing-well/README.md)
+    - AAD JWT Auth
+    - Uses new functional syntax
+    - Uses new effects hook
 - [Going Further](#going-further)
 
 ## Getting Started
@@ -52,6 +56,20 @@ Things I would improve if this were a real project.
 - Better dependency documentation
 - Better aggregate the number of coins (or queue messages processed)
 - Integrate ;)
+
+### Frontend
+
+- Put behind an Azure CDN
+    - Better scaling
+    - Custom domain
+- Testing
+
+### Devops
+
+- Better expose and document deploy scripts
+- End to End test
+- Create github-actions to leverege the release-pipeline and stand up an instance per PR for ease of review
+
 ### Backend
 
 - More Error handling :(

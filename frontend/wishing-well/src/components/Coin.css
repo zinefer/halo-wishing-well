@@ -1,0 +1,41 @@
+@keyframes coin-spin {
+    from {
+        transform: rotate3d(0, 1, 0, 0deg);
+    }
+    to {
+        transform: rotate3d(0, 1, 0, 360deg);
+    }
+}
+
+@keyframes lift-and-fade {
+    from {
+      opacity: 1;
+    }
+    to {
+      opacity: 0;
+      top: 20%;
+    }
+  }
+  
+.coin {
+    background-image: url('../img/halo-coin.png');
+    background-position: center;
+    background-size: contain;
+    max-width:25vmin;
+    max-height:25vmin;
+    position:relative;
+    height: 100%;
+    width: 100%;
+    top: 50%;
+    left: 30%;
+    cursor: pointer;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+    .coin {
+        animation: coin-spin infinite 5s linear;
+    }
+    .coin.clicked {
+        animation: coin-spin infinite 5s linear, lift-and-fade 2s;
+    }
+}
