@@ -8,6 +8,7 @@ This is an (incomplete) sample project for 343 industries.
     - Powershell scripts
         - Expose release-pipeline functionality for developer convenience
         - Keep release-pipeline DRY
+    - [Terraform IaC](devops/terraform/README.md)
 - [C# API Backend](backend/README.md)
 
 ## Getting Started
