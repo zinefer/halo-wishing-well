@@ -59,11 +59,11 @@ jobs:
       - name: Provision Ephemeral
         uses: azure/powershell@v1
         env:
+          TF_VAR_api_image: ${{ env.API_IMAGE }}
           TF_CLI_ARGS_init: >
             -backend-config="resource_group_name=${{ env.TF_VAR_durable_resource_group }}"
             -backend-config="storage_account_name=${{ env.TF_VAR_durable_storage_account }}"
             -backend-config="key=durable-dev.tfstate"
-          TF_VAR_api_image: ${{ env.API_IMAGE }}
         with:
           azPSVersion: latest
           inlineScript: devops/scripts/provision-ephemeral.ps1
@@ -92,6 +92,12 @@ jobs:
           enable-AzPSSession: true
       - name: Cleanup
         uses: azure/powershell@v1
+        env:
+          TF_VAR_api_image: ${{ env.API_IMAGE }}
+          TF_CLI_ARGS_init: >
+            -backend-config="resource_group_name=${{ env.TF_VAR_durable_resource_group }}"
+            -backend-config="storage_account_name=${{ env.TF_VAR_durable_storage_account }}"
+            -backend-config="key=durable-dev.tfstate"
         with:
           azPSVersion: latest
           inlineScript: devops/scripts/cleanup.ps1
