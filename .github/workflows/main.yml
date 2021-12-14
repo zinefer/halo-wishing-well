@@ -5,36 +5,79 @@ on:
     branches:
       - main
 
+env:
+  TF_IN_AUTOMATION: true
+  TF_CLI_ARGS_apply: -auto-approve
+  ARM_CLIENT_ID: ${{ secrets.ARM_CLIENT_ID }}
+  ARM_CLIENT_SECRET: ${{ secrets.ARM_CLIENT_SECRET }}
+  ARM_SUBSCRIPTION_ID: ${{ secrets.ARM_SUBSCRIPTION_ID }}
+  ARM_TENANT_ID: ${{ secrets.ARM_TENANT_ID }}
+  TF_VAR_durable_resource_group: wishing-well-durable
+  TF_VAR_durable_storage_account: wishwellstorage
+  TF_VAR_base_name: wish-well-dev
+
 jobs:
+  Durable:
+    name: Provision Durable
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: azure/login@v1
+        with:
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
+          enable-AzPSSession: true
+      - name: Provision Durable
+        uses: azure/powershell@v1
+        with:
+          azPSVersion: latest
+          inlineScript: devops/scripts/provision-durable.ps1
+
   Lint:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
-      - run: ./devops/scripts/lint.ps1
+      - run: devops/scripts/lint.ps1
         shell: pwsh
 
   Build:
+    name: Build and Test
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
-      - run: ./devops/scripts/build.ps1
+      - run: devops/scripts/build.ps1
         shell: pwsh
 
   Provision:
-    needs: [Build]
-    if: success()
+    needs: [Durable]
     runs-on: ubuntu-latest
     steps:
-      - run: ./devops/scripts/provision.ps1
-
-  Deploy:
-    needs: [Provision]
-    if: success()
-    runs-on: ubuntu-latest
-    steps:
+      - uses: actions/checkout@v2
       - uses: azure/login@v1
         with:
           creds: ${{ secrets.AZURE_CREDENTIALS }}
+          enable-AzPSSession: true
+      - name: Provision Ephemeral
+        uses: azure/powershell@v1
+        env:
+          TF_VAR_api_image: ${{ env.API_IMAGE }}
+          TF_CLI_ARGS_init: >
+            -backend-config="resource_group_name=${{ env.TF_VAR_durable_resource_group }}"
+            -backend-config="storage_account_name=${{ env.TF_VAR_durable_storage_account }}"
+            -backend-config="key=durable-dev.tfstate"
+        with:
+          azPSVersion: latest
+          inlineScript: devops/scripts/provision-ephemeral.ps1
+
+  Deploy:
+    needs: [Provision, Build]
+    if: success()
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: azure/login@v1
+        with:
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
+          enable-AzPSSession: true
       - run: echo "🎉"
 
   Cleanup:
@@ -42,4 +85,19 @@ jobs:
     if: always()
     runs-on: ubuntu-latest
     steps:
-      - run: echo "🎉"
+      - uses: actions/checkout@v2
+      - uses: azure/login@v1
+        with:
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
+          enable-AzPSSession: true
+      - name: Cleanup
+        uses: azure/powershell@v1
+        env:
+          TF_VAR_api_image: ${{ env.API_IMAGE }}
+          TF_CLI_ARGS_init: >
+            -backend-config="resource_group_name=${{ env.TF_VAR_durable_resource_group }}"
+            -backend-config="storage_account_name=${{ env.TF_VAR_durable_storage_account }}"
+            -backend-config="key=durable-dev.tfstate"
+        with:
+          azPSVersion: latest
+          inlineScript: devops/scripts/cleanup.ps1
