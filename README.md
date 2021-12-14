@@ -8,10 +8,13 @@ This is an (incomplete) sample project for 343 industries.
     - Powershell scripts
         - Expose release-pipeline functionality for developer convenience
         - Keep release-pipeline DRY
+- [C# API Backend](backend/README.md)
 
 ## Getting Started
 
 ### Lint
+
+Dependencies: `npm`, `yamllint`, `terraform`
 
 ```sh
 ./devops/scripts/lint.ps1
