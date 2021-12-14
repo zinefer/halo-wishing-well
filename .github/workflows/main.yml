@@ -13,10 +13,14 @@ env:
   ARM_CLIENT_SECRET: ${{ secrets.ARM_CLIENT_SECRET }}
   ARM_SUBSCRIPTION_ID: ${{ secrets.ARM_SUBSCRIPTION_ID }}
   ARM_TENANT_ID: ${{ secrets.ARM_TENANT_ID }}
-  # Deploy
+  # Provision
   TF_VAR_durable_resource_group: wishing-well-durable
   TF_VAR_durable_storage_account: wishwellstorage
   TF_VAR_base_name: wish-well-dev
+  REACT_APP_AD_APPLICATION_ID: 11434dfc-a099-4a3b-9e1e-56fa8346d381
+  REACT_APP_AD_TENANT_ID: 91b0258d-f492-4f82-9975-5c0e0889d73b
+  REACT_APP_AD_REDIRECT: http://localhost:3000
+  # Docker
   API_IMAGE: wishingwell.api:dev
 
 jobs:
@@ -49,6 +53,12 @@ jobs:
       - uses: actions/checkout@v2
       - run: devops/scripts/build.ps1
         shell: pwsh
+      - run: devops/scripts/save-docker.ps1
+        shell: pwsh
+      - uses: actions/upload-artifact@v2
+        with:
+          name: docker-artifacts
+          path: docker-artifacts
 
   Provision:
     needs: [Durable]
@@ -81,7 +91,23 @@ jobs:
         with:
           creds: ${{ secrets.AZURE_CREDENTIALS }}
           enable-AzPSSession: true
-      - run: echo "🎉"
+      - uses: azure/powershell@v1
+        env:
+          TF_CLI_ARGS_init: >
+            -backend-config="resource_group_name=${{ env.TF_VAR_durable_resource_group }}"
+            -backend-config="storage_account_name=${{ env.TF_VAR_durable_storage_account }}"
+            -backend-config="key=durable-dev.tfstate"
+        with:
+          azPSVersion: latest
+          inlineScript: devops/scripts/terraform-outputs.ps1
+      - uses: actions/download-artifact@v2
+        with:
+          name: docker-artifacts
+          path: docker-artifacts
+      - uses: azure/powershell@v1
+        with:
+          azPSVersion: latest
+          inlineScript: devops/scripts/deploy.ps1
 
   Cleanup:
     needs: [Deploy]
