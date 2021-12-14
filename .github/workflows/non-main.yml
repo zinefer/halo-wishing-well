@@ -5,6 +5,9 @@ on:
     branches-ignore:
       - main
 
+env:
+  TF_IN_AUTOMATION: true
+
 jobs:
   Lint:
     runs-on: ubuntu-latest
