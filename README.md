@@ -57,7 +57,6 @@ Things I would improve if this were a real project.
 - Better aggregate the number of coins (or queue messages processed)
 - Integrate ;)
 
-
 ### Frontend
 
 - Put behind an Azure CDN
