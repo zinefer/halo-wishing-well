@@ -14,6 +14,10 @@ output "frontend_storage_account" {
   value = azurerm_storage_account.frontend.name
 }
 
+output "aks_name" {
+  value = azurerm_kubernetes_cluster.processing.name
+}
+
 output "queue_storage_account" {
   value = azurerm_storage_account.queue.name
 }
