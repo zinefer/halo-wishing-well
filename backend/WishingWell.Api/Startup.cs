@@ -45,6 +45,30 @@ namespace WishingWell.Api
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            services.AddOptions();
+            services
+                .AddOptions<StorageOptions>()
+                .Bind(this.Configuration.GetSection("Storage"))
+                .ValidateDataAnnotations();
+
+            services.AddScoped<TableClient>(sp =>
+            {
+                var options = sp.GetRequiredService<IOptions<StorageOptions>>().Value;
+                var credential = sp.GetRequiredService<TokenCredential>();
+                return new TableClient(options.TableEndpoint, options.CoinsTableName, credential);
+            });
+
+            services.AddScoped<QueueClient>(sp =>
+           {
+               var options = sp.GetRequiredService<IOptions<StorageOptions>>().Value;
+               var credential = sp.GetRequiredService<TokenCredential>();
+               return new QueueClient(options.QueueEndpoint, credential);
+           });
+
+            services.AddScoped<ICoinsTableRepository, CoinsTableRepository>();
+            services.AddScoped<IWishQueueService, WishQueueService>();
+            services.AddScoped<IWishCountService, WishCountService>();
+
             services.AddControllers();
 
             services.AddSwaggerGen(c =>

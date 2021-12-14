@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using Azure.Data.Tables;
 using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
 
 using WishingWell.Models;
 
